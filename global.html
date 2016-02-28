@@ -33,7 +33,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu inline">
-					<li><a href="global.html#connectMongo">connectMongo</a></li><li><a href="global.html#getFalseDiscussionList">getFalseDiscussionList</a></li><li><a href="global.html#ModelFind">ModelFind</a></li><li><a href="global.html#throwError">throwError</a></li>
+					<li><a href="global.html#connectMongo">connectMongo</a></li><li><a href="global.html#getFalseDiscussionList">getFalseDiscussionList</a></li><li><a href="global.html#throwError">throwError</a></li><li><a href="global.html#ModelFind">ModelFind</a></li><li><a href="global.html#executeAngular">executeAngular</a></li><li><a href="global.html#getDiscussions">getDiscussions</a></li><li><a href="global.html#signUp">signUp</a></li><li><a href="global.html#logIn">logIn</a></li>
 				</ul>
 			</li>
 			
@@ -272,8 +272,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="config_functions.js.html">config/functions.js</a>,
-				 <a href="config_functions.js.html#sunlight-1-line-13">line 13</a>
+				<a href="lib_config_functions.js.html">lib/config/functions.js</a>,
+				 <a href="lib_config_functions.js.html#sunlight-1-line-13">line 13</a>
 			</li>
 		</ul>
 	</dd>
@@ -371,8 +371,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="config_functions.js.html">config/functions.js</a>,
-				 <a href="config_functions.js.html#sunlight-1-line-103">line 103</a>
+				<a href="lib_config_functions.js.html">lib/config/functions.js</a>,
+				 <a href="lib_config_functions.js.html#sunlight-1-line-103">line 103</a>
 			</li>
 		</ul>
 	</dd>
@@ -402,6 +402,179 @@
             
 <div class="param-desc">
     object
+</div>
+
+
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="throwError"><span class="type-signature"></span>throwError(message, error)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Throw an error without stopping nodejs program
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">message to debug</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Error</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">unexpected error, if any, that returned from the function</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="lib_config_functions.js.html">lib/config/functions.js</a>,
+				 <a href="lib_config_functions.js.html#sunlight-1-line-152">line 152</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    false
 </div>
 
 
@@ -569,8 +742,8 @@ Supposedly "learns" from what it does...
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="models_index.js.html">models/index.js</a>,
-				 <a href="models_index.js.html#sunlight-1-line-108">line 108</a>
+				<a href="lib_models_index.js.html">lib/models/index.js</a>,
+				 <a href="lib_models_index.js.html#sunlight-1-line-108">line 108</a>
 			</li>
 		</ul>
 	</dd>
@@ -613,7 +786,7 @@ ModelFind(User, { username: &quot;username&quot; }, function (err, user) {
             
 <hr>
 <dt>
-    <h4 class="name" id="throwError"><span class="type-signature"></span>throwError(message, error)</h4>
+    <h4 class="name" id="executeAngular"><span class="type-signature"></span>executeAngular(forumPath, user)</h4>
     
     
 </dt>
@@ -621,7 +794,8 @@ ModelFind(User, { username: &quot;username&quot; }, function (err, user) {
 
     
     <div class="description">
-        Throw an error without stopping nodejs program
+        Executes the angular for the page
+Used to get the forumPath & user values
     </div>
     
 
@@ -656,7 +830,7 @@ ModelFind(User, { username: &quot;username&quot; }, function (err, user) {
 
         <tr>
             
-                <td class="name"><code>message</code></td>
+                <td class="name"><code>forumPath</code></td>
             
 
             <td class="type">
@@ -673,20 +847,20 @@ ModelFind(User, { username: &quot;username&quot; }, function (err, user) {
 
             
 
-            <td class="description last">message to debug</td>
+            <td class="description last">the forum's path; ex: '/', '/forum'</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>error</code></td>
+                <td class="name"><code>user</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Error</span>
+<span class="param-type">Object</span>
 
 
 
@@ -697,7 +871,7 @@ ModelFind(User, { username: &quot;username&quot; }, function (err, user) {
 
             
 
-            <td class="description last">unexpected error, if any, that returned from the function</td>
+            <td class="description last">the user object from req.user in lib/routes/index.js</td>
         </tr>
 
     
@@ -741,8 +915,8 @@ ModelFind(User, { username: &quot;username&quot; }, function (err, user) {
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="config_functions.js.html">config/functions.js</a>,
-				 <a href="config_functions.js.html#sunlight-1-line-152">line 152</a>
+				<a href="lib_public_assets_angular_app.js.html">lib/public/assets/angular/app.js</a>,
+				 <a href="lib_public_assets_angular_app.js.html#sunlight-1-line-9">line 9</a>
 			</li>
 		</ul>
 	</dd>
@@ -767,17 +941,277 @@ ModelFind(User, { username: &quot;username&quot; }, function (err, user) {
     
 
     
-    <h5>Returns:</h5>
+
     
-            
-<div class="param-desc">
-    false
-</div>
-
-
-
+</dd>
 
         
+            
+<hr>
+<dt>
+    <h4 class="name" id="getDiscussions"><span class="type-signature"></span>getDiscussions()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Gets the discussion list from the api and displays them
+by using angularjs
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="lib_public_assets_angular_app.js.html">lib/public/assets/angular/app.js</a>,
+				 <a href="lib_public_assets_angular_app.js.html#sunlight-1-line-47">line 47</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="signUp"><span class="type-signature"></span>signUp()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Function to sign up the user;
+Uses AngularJS
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="lib_public_assets_angular_app.js.html">lib/public/assets/angular/app.js</a>,
+				 <a href="lib_public_assets_angular_app.js.html#sunlight-1-line-246">line 246</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="logIn"><span class="type-signature"></span>logIn()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Function to login in the user;
+Uses AngularJS
+-
+First, Checks if valid credentials & user exists.
+If user doesn't exist, redirects user to /api/login to login.
+If user exists, show error(s).
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="lib_public_assets_angular_app.js.html">lib/public/assets/angular/app.js</a>,
+				 <a href="lib_public_assets_angular_app.js.html#sunlight-1-line-321">line 321</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 
     
 </dd>
@@ -834,7 +1268,7 @@ ModelFind(User, { username: &quot;username&quot; }, function (err, user) {
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
 	
-		on Sunday, February 28th 2016, 11:58:38 am
+		on Sunday, February 28th 2016, 12:28:28 pm
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

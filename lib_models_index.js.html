@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>FlarumJS/Node-Flarum Inline Documentation Index</title>
+	<title>FlarumJS/Node-Flarum Inline Documentation Source: lib/models/index.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -58,63 +58,143 @@
 <div class="row">
 
 	
-	<div class="col-md-8">
+	<div class="col-md-12">
 	
 		<div id="main">
 			
 
-	
-	
+		<h1 class="page-title">Source: lib/models/index.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+// var db = mongoose.connection;
+// var P = require('bluebird');
+var shortid = require('shortid');
+var bcrypt = require('bcrypt-nodejs');
+var P = require('bluebird')
 
 
+var userSchema = new Schema({
+	name: String,
+	username: String,
+	email: String,
+	password: String,
+	id: Number,
+	lastLoggedIn: String,
+	createdIn: String,
+	admin: Boolean,
+	google: {
+		id: String,
+		token: String
+	}
+});
 
 
+/**
+	* Generate hash for password, aka encrypt password
+	*
+	* @param  {String} password  - the password entered
+	*
+	* @return string
+**/
+userSchema.methods.generateHash = function (password) { //
+	return bcrypt.hashSync(password, bcrypt.genSaltSync(12), null);
+};
 
 
+/**
+	* Check if password entered is right
+	* Compares encrypted password with entered password
+	*
+	* @param  {String} password
+	*
+	* @return boolean
+	*
+	* @example {@lang javascript}
+	* user.validPassword("pass1234")
+**/
+userSchema.methods.validPassword = function (password) { //
+	return bcrypt.compareSync(password, this.password);
+};
 
+var forumSettingsSchema = new Schema({
+	name: String,
+	description: String,
+	content: Schema.Types.Mixed
+});
 
+var forumTagsSchema = new Schema({
+	name: String,
+	slug: String,
+	description: String,
+	color: String,
+	default_sort: String,
+	is_restricted: Boolean,
+	is_hidden: Boolean,
+	discussions_count: Number
+});
 
+var forumPostsSchema = new Schema({
+	title: String,
+	replyCount: Number,
+	tags: Array,
+	start_time: Date,
+	start_user_id: Number,
+	start_post_id: Number,
+	last_time: Date,
+	last_user_id: Number,
+	last_post_id: Number,
+	last_post_number: Number,
+	is_approved: Boolean,
+	is_locked: Boolean,
+	is_sticky: Boolean,
+	deleted: Boolean,
+	deletedForever: Boolean
+});
 
+// SCHEMAS
+var User = mongoose.model('User', userSchema);
+var ForumSetting = mongoose.model('ForumSetting', forumSettingsSchema);
+var ForumTag = mongoose.model('ForumTag', forumTagsSchema);
+var ForumPost = mongoose.model('ForumPost', forumPostsSchema);
 
-	
-	
+/**
+	* Instead of Model.find(), uses Model.aggregate() to look for documents
+	* Supposedly "learns" from what it does...
+	*
+	* @param {Schema}   model    - the model to find the documents in; ex: User, ForumSetting
+	* @param {Object}   what     - the object look for documents, aka Model.find(OBJECT), but using Model.match
+	* @param {Function} callback - callback function
+	*
+	* @example {@lang javascript}
+	* ModelFind(User, { username: "username" }, function (err, user) {
+	*   if (err) throw err;
+	*   console.log(user);
+	* })
+**/
+var ModelFind = function (model, what, callback) { //
+	P.resolve(model.aggregate().match(what).exec()).then(function (doc) {
+		callback(null, doc)
+	}).catch(function (err) {
+		callback(err, null)
+	});
+}
 
-
-
-
-
-    <section class="readme-section">
-        <article><h1>node-flarum</h1><p><a href="https://travis-ci.org/FlarumJS/node-flarum"><img src="https://travis-ci.org/FlarumJS/node-flarum.svg?branch=master" alt="Build Status"></a> <a href="https://badge.fury.io/gh/FlarumJS%2Fnode-flarum"><img src="https://badge.fury.io/gh/FlarumJS%2Fnode-flarum.svg" alt="GitHub version"></a> <a href="https://badge.fury.io/js/node-flarum"><img src="https://badge.fury.io/js/node-flarum.svg" alt="NPM version"></a></p>
-<p>A forum made out of <a href="http://flarum.org">Flarum</a>'s design forum with NodeJS</p>
-<h2>Installation</h2><h4>Stable</h4><pre class="prettyprint source lang-sh"><code>npm install node-flarum --save</code></pre><h4>Latest Release</h4><pre class="prettyprint source lang-sh"><code>npm install git+https://github.com/FlarumJS/node-flarum.git --save</code></pre><h2>Usage</h2><h3>HTTP</h3><p>Using the http package required the following modules to be installed: <em>connect</em> &amp; <em>connect-hopeful-body-parser</em></p>
-<pre class="prettyprint source lang-node"><code>var http = require('http');
-var connect = require('connect');
-var bodyParser = require('connect-hopeful-body-parser');
-
-var flarum = require('./index');
-
-var app = connect();
-
-app.use(bodyParser());
-app.use(flarum); // You can only have flarum in root path, otherwise won't work
-
-http.createServer(app).listen(8080);</code></pre><h3>Express</h3><pre class="prettyprint source lang-node"><code>var flarum = require('node-flarum');
-
-var express = require('express');
-var app = express();
-
-// Other stuff
-
-app.use('/forum', flarum) // This will execute flarum on the &quot;/forum&quot; path
-app.use(flarum)           // This will execute flarum on the root path</code></pre><h2>Contributing</h2><p>Whenever this forum is complete [•••], there will be a website here for the official <em>NodeJS</em> Flarum forum</p>
-<h2>Release History</h2><ul>
-<li>v0.0.1-beta.1 - NPM Package Information</li>
-<li>v0.0.1.beta.2 - Added Configuration Tweaks, fixed links and mongodb problems (<a href="https://github.com/FlarumJS/node-flarum/releases/tag/v0.0.1-beta.2">Full Release Information</a>)</li>
-<li>v0.0.1-beta.3 - Added Sign Up &amp; Log In Options (<a href="https://github.com/FlarumJS/node-flarum/releases/tag/v0.0.1-beta.3">Full Release Information</a>)</li>
-</ul></article>
-    </section>
-
-
+module.exports = {
+	user: User,
+	forum: {
+		settings: ForumSetting,
+		tags: ForumTag,
+		posts: ForumPost
+	},
+	find: ModelFind
+};
+</pre>
+    </article>
+</section>
 
 
 
@@ -125,10 +205,6 @@ app.use(flarum)           // This will execute flarum on the root path</code></p
 
 	<div class="clearfix"></div>
 
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
 	
 
 </div>

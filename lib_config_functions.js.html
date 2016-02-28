@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>FlarumJS/Node-Flarum Inline Documentation Index</title>
+	<title>FlarumJS/Node-Flarum Inline Documentation Source: lib/config/functions.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -58,63 +58,181 @@
 <div class="row">
 
 	
-	<div class="col-md-8">
+	<div class="col-md-12">
 	
 		<div id="main">
 			
 
-	
-	
+		<h1 class="page-title">Source: lib/config/functions.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">var mongoose = require('mongoose');
+var debugError = require('debug')('flarum:error');
+var connected;
+
+/**
+	* Connect to mongodb via mongoose
+	*
+	* @param {Object}   mongo      - object containing host &amp; database; optional: username &amp; password
+	* @param {Function} callback   - callback function
+	*
+	* @return object
+**/
+var connectMongo = function (mongo, callback) {
+	connected = false;
+
+	if (!mongo || typeof mongo !== 'object') return { error: 'INVALID ARGUMENTS: No "mongo" typeof object argument found', mongo: null }
+
+	if (mongo.host &amp;&amp; mongo.database &amp;&amp; !mongo.username &amp;&amp; !mongo.password) {
+		var mongoUrl = 'mongodb://' + mongo.host + '/' + mongo.database;
+		mongoose.connect(mongoUrl);
+
+		mongoose.connection.on('error', function (err) {
+			connected = true;
+			if (!callback) {
+				return { error: 'Could not connect to MongoDB; ' + err, mongo: null }
+			} else {
+				callback('Could not connect to MongoDB; ' + err, null)
+			}
+		});
+		mongoose.connection.on('open', function (ref) {
+			connected = true;
+
+			if (callback) callback(null, mongoose.connection);
+
+			return { error: null, mongo: true }
+
+		});
 
 
+		setTimeout(function () {
+			if (!connected) {
+				if (!callback) {
+					return { error: 'Could not connect to MongoDB; ERROR: Timeout', mongo: null }
+				} else {
+					callback('Could not connect to MongoDB; ERROR: Timeout', null);
+				}
+			}
+
+		}, 7500)
+
+	} else if (mongo.host &amp;&amp; mongo.database &amp;&amp; mongo.username &amp;&amp; mongo.password) {
+
+		var mongoUrl = 'mongodb://' + mongo.username + ':';
+		mongoUrl += mongo.password + '@';
+		mongoUrl += mongo.host + '/' + mongo.database;
+		mongoose.connect(mongoUrl);
+
+		mongoose.connection.on('error', function (err) {
+			connected = true;
+			if (!callback) {
+				return { error: 'Could not connect to MongoDB; ' + err, mongo: null }
+			} else {
+				callback('Could not connect to MongoDB; ' + err, null)
+			}
+		});
+		mongoose.connection.on('open', function (ref) {
+			connected = true;
+
+			if (!callback) {
+				return { error: null, mongo: mongoose.connection }
+			} else {
+				callback(null, mongoose.connection)
+			}
+
+		});
+
+		setTimeout(function () {
+			if (!connected) {
+				if (!callback) {
+					return { error: 'Could not connect to MongoDB; ERROR: Timeout', mongo: null }
+				} else {
+					callback('Could not connect to MongoDB; ERROR: Timeout', null);
+				}
+			}
+
+		}, 7500)
+
+	} else {
+		if (!callback) {
+			return { error: 'Invalid credentials provided; Either (host+db) or (host+db+username+password) are allowed', mongo: null }
+		} {
+			callback(null, null);
+		}
+	}
+}
 
 
+/**
+	* Get a false discussion list; for development only
+	*
+	* @return object
+**/
+var getFalseDiscussionList = function () {
+	var falseDiscussionList = {
+		posts: [
+			{
+				title: 'lol',
+				slug: '1-test-discussion',
+				start_username: 'datitisev',
+				last_username: 'hola',
+				replyCount: 9,
+				tags: [
+					{
+						color: 'red',
+						label: 'Hi'
+					}, {
+						color: 'yellow',
+						label: 'Bye'
+					}
+				]
+			},
+			{
+				title: 'hahaha',
+				slug: '2-test-discussion',
+				start_username: 'hola',
+				last_username: 'datitisev',
+				replyCount: 24,
+				tags: [
+					{
+						color: 'blue',
+						label: 'Blue'
+					}, {
+						color: 'lightgray',
+						label: 'General'
+					}
+				]
+			}
+		]
+	}
+	return falseDiscussionList;
+}
 
 
+/**
+	* Throw an error without stopping nodejs program
+	*
+	* @param {String}  message  - message to debug
+	* @param {Error}   error    - unexpected error, if any, that returned from the function
+	*
+	* @return false
+**/
+var throwError = function (message, error) {
+	debugError(message);
+	if (error) debugError(error);
+	return false;
+}
 
-
-
-
-
-	
-	
-
-
-
-
-
-    <section class="readme-section">
-        <article><h1>node-flarum</h1><p><a href="https://travis-ci.org/FlarumJS/node-flarum"><img src="https://travis-ci.org/FlarumJS/node-flarum.svg?branch=master" alt="Build Status"></a> <a href="https://badge.fury.io/gh/FlarumJS%2Fnode-flarum"><img src="https://badge.fury.io/gh/FlarumJS%2Fnode-flarum.svg" alt="GitHub version"></a> <a href="https://badge.fury.io/js/node-flarum"><img src="https://badge.fury.io/js/node-flarum.svg" alt="NPM version"></a></p>
-<p>A forum made out of <a href="http://flarum.org">Flarum</a>'s design forum with NodeJS</p>
-<h2>Installation</h2><h4>Stable</h4><pre class="prettyprint source lang-sh"><code>npm install node-flarum --save</code></pre><h4>Latest Release</h4><pre class="prettyprint source lang-sh"><code>npm install git+https://github.com/FlarumJS/node-flarum.git --save</code></pre><h2>Usage</h2><h3>HTTP</h3><p>Using the http package required the following modules to be installed: <em>connect</em> &amp; <em>connect-hopeful-body-parser</em></p>
-<pre class="prettyprint source lang-node"><code>var http = require('http');
-var connect = require('connect');
-var bodyParser = require('connect-hopeful-body-parser');
-
-var flarum = require('./index');
-
-var app = connect();
-
-app.use(bodyParser());
-app.use(flarum); // You can only have flarum in root path, otherwise won't work
-
-http.createServer(app).listen(8080);</code></pre><h3>Express</h3><pre class="prettyprint source lang-node"><code>var flarum = require('node-flarum');
-
-var express = require('express');
-var app = express();
-
-// Other stuff
-
-app.use('/forum', flarum) // This will execute flarum on the &quot;/forum&quot; path
-app.use(flarum)           // This will execute flarum on the root path</code></pre><h2>Contributing</h2><p>Whenever this forum is complete [•••], there will be a website here for the official <em>NodeJS</em> Flarum forum</p>
-<h2>Release History</h2><ul>
-<li>v0.0.1-beta.1 - NPM Package Information</li>
-<li>v0.0.1.beta.2 - Added Configuration Tweaks, fixed links and mongodb problems (<a href="https://github.com/FlarumJS/node-flarum/releases/tag/v0.0.1-beta.2">Full Release Information</a>)</li>
-<li>v0.0.1-beta.3 - Added Sign Up &amp; Log In Options (<a href="https://github.com/FlarumJS/node-flarum/releases/tag/v0.0.1-beta.3">Full Release Information</a>)</li>
-</ul></article>
-    </section>
-
-
+module.exports = {
+	connectMongo: connectMongo,
+	getFalseDiscussionList: getFalseDiscussionList,
+	throwError: throwError
+}
+</pre>
+    </article>
+</section>
 
 
 
@@ -125,10 +243,6 @@ app.use(flarum)           // This will execute flarum on the root path</code></p
 
 	<div class="clearfix"></div>
 
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
 	
 
 </div>
