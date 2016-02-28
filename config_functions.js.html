@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>FlarumJS/Node-Flarum Inline Documentation Source: config/functions.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">FlarumJS/Node-Flarum Inline Documentation</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="global.html#connectMongo">connectMongo</a></li><li><a href="global.html#getFalseDiscussionList">getFalseDiscussionList</a></li><li><a href="global.html#ModelFind">ModelFind</a></li><li><a href="global.html#throwError">throwError</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: config/functions.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">var mongoose = require('mongoose');
+var debugError = require('debug')('flarum:error');
+var connected;
+
+/**
+	* Connect to mongodb via mongoose
+	*
+	* @param {Object}   mongo      - object containing host &amp; database; optional: username &amp; password
+	* @param {Function} callback   - callback function
+	*
+	* @return object
+**/
+var connectMongo = function (mongo, callback) {
+	connected = false;
+
+	if (!mongo || typeof mongo !== 'object') return { error: 'INVALID ARGUMENTS: No "mongo" typeof object argument found', mongo: null }
+
+	if (mongo.host &amp;&amp; mongo.database &amp;&amp; !mongo.username &amp;&amp; !mongo.password) {
+		var mongoUrl = 'mongodb://' + mongo.host + '/' + mongo.database;
+		mongoose.connect(mongoUrl);
+
+		mongoose.connection.on('error', function (err) {
+			connected = true;
+			if (!callback) {
+				return { error: 'Could not connect to MongoDB; ' + err, mongo: null }
+			} else {
+				callback('Could not connect to MongoDB; ' + err, null)
+			}
+		});
+		mongoose.connection.on('open', function (ref) {
+			connected = true;
+
+			if (callback) callback(null, mongoose.connection);
+
+			return { error: null, mongo: true }
+
+		});
+
+
+		setTimeout(function () {
+			if (!connected) {
+				if (!callback) {
+					return { error: 'Could not connect to MongoDB; ERROR: Timeout', mongo: null }
+				} else {
+					callback('Could not connect to MongoDB; ERROR: Timeout', null);
+				}
+			}
+
+		}, 7500)
+
+	} else if (mongo.host &amp;&amp; mongo.database &amp;&amp; mongo.username &amp;&amp; mongo.password) {
+
+		var mongoUrl = 'mongodb://' + mongo.username + ':';
+		mongoUrl += mongo.password + '@';
+		mongoUrl += mongo.host + '/' + mongo.database;
+		mongoose.connect(mongoUrl);
+
+		mongoose.connection.on('error', function (err) {
+			connected = true;
+			if (!callback) {
+				return { error: 'Could not connect to MongoDB; ' + err, mongo: null }
+			} else {
+				callback('Could not connect to MongoDB; ' + err, null)
+			}
+		});
+		mongoose.connection.on('open', function (ref) {
+			connected = true;
+
+			if (!callback) {
+				return { error: null, mongo: mongoose.connection }
+			} else {
+				callback(null, mongoose.connection)
+			}
+
+		});
+
+		setTimeout(function () {
+			if (!connected) {
+				if (!callback) {
+					return { error: 'Could not connect to MongoDB; ERROR: Timeout', mongo: null }
+				} else {
+					callback('Could not connect to MongoDB; ERROR: Timeout', null);
+				}
+			}
+
+		}, 7500)
+
+	} else {
+		if (!callback) {
+			return { error: 'Invalid credentials provided; Either (host+db) or (host+db+username+password) are allowed', mongo: null }
+		} {
+			callback(null, null);
+		}
+	}
+}
+
+
+/**
+	* Get a false discussion list; for development only
+	*
+	* @return object
+**/
+var getFalseDiscussionList = function () {
+	var falseDiscussionList = {
+		posts: [
+			{
+				title: 'lol',
+				slug: '1-test-discussion',
+				start_username: 'datitisev',
+				last_username: 'hola',
+				replyCount: 9,
+				tags: [
+					{
+						color: 'red',
+						label: 'Hi'
+					}, {
+						color: 'yellow',
+						label: 'Bye'
+					}
+				]
+			},
+			{
+				title: 'hahaha',
+				slug: '2-test-discussion',
+				start_username: 'hola',
+				last_username: 'datitisev',
+				replyCount: 24,
+				tags: [
+					{
+						color: 'blue',
+						label: 'Blue'
+					}, {
+						color: 'lightgray',
+						label: 'General'
+					}
+				]
+			}
+		]
+	}
+	return falseDiscussionList;
+}
+
+
+/**
+	* Throw an error without stopping nodejs program
+	*
+	* @param {String}  message  - message to debug
+	* @param {Error}   error    - unexpected error, if any, that returned from the function
+	*
+	* @return false
+**/
+var throwError = function (message, error) {
+	debugError(message);
+	if (error) debugError(error);
+	return false;
+}
+
+module.exports = {
+	connectMongo: connectMongo,
+	getFalseDiscussionList: getFalseDiscussionList,
+	throwError: throwError
+}
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+<footer>
+
+
+	<span class="copyright">
+	© 2016 FlarumJS
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+		on Sunday, February 28th 2016, 11:58:38 am
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+<script>
+	$( function () {
+		$( '#main' ).localScroll( {
+			offset : { top : 60 } //offset by the height of your header (give or take a few px, see what works for you)
+		} );
+		$( "dt.name" ).each( function () {
+			var $this = $( this ).find("h4");
+			var icon = $( "<i/>" ).addClass( "icon-plus-sign" ).addClass( "pull-right" ).addClass( "icon-white" );
+			var dt = $(this);
+			var children = dt.next( "dd" );
+
+			dt.prepend( icon ).css( {cursor : "pointer"} );
+			dt.addClass( "member-collapsed" ).addClass( "member" );
+
+
+			children.hide();
+
+			dt.children().on( "click", function () {
+				children = dt.next( "dd" );
+				children.slideToggle( "fast", function () {
+
+					if ( children.is( ":visible" ) ) {
+						icon.addClass( "icon-minus-sign" ).removeClass( "icon-plus-sign" ).removeClass( "icon-white" );
+						dt.addClass( "member-open" ).animate( "member-collapsed" );
+					} else {
+						icon.addClass( "icon-plus-sign" ).removeClass( "icon-minus-sign" ).addClass( "icon-white" );
+						dt.addClass( "member-collapsed" ).removeClass( "member-open" );
+					}
+				} );
+			} );
+
+		} );
+	} );
+</script>
+
+
+<!--Google Analytics-->
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
+
+</body>
+</html>
