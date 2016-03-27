@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>FlarumJS/Node-Flarum Inline Documentation Source: public/assets/angular/app.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cosmo.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">FlarumJS/Node-Flarum Inline Documentation</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="global.html#connectMongo">connectMongo</a></li><li><a href="global.html#throwError">throwError</a></li><li><a href="global.html#createFlarumFolder">createFlarumFolder</a></li><li><a href="global.html#createConfigFile">createConfigFile</a></li><li><a href="global.html#sluglify">sluglify</a></li><li><a href="global.html#getFalseDiscussionList">getFalseDiscussionList</a></li><li><a href="global.html#ModelFind">ModelFind</a></li><li><a href="global.html#executeAngular">executeAngular</a></li><li><a href="global.html#getDiscussions">getDiscussions</a></li><li><a href="global.html#signUp">signUp</a></li><li><a href="global.html#logIn">logIn</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: public/assets/angular/app.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">/**
+	* Executes the angular for the page
+	* Used to get the forumPath &amp; user values
+	*
+	* @param {String}  forumPath  -  the forum's path; ex: '/', '/forum'
+	* @param {String}  userToken  -  the user's token from req.user in lib/routes/index.js
+	**/
+
+function executeAngular (forumPath, userToken) { //
+
+	var token = userToken || null;
+
+	const pathname = document.location.pathname;
+
+	if (pathname === forumPath + 'login' || pathname === forumPath + 'signup') {
+		history.replaceState({}, 'Log In - FlarumJS', forumPath);
+	}
+
+	var app = angular.module('flarum', [ 'angularMoment' ]);
+
+	app.config(function ($interpolateProvider) {
+		$interpolateProvider.startSymbol('[[');
+		$interpolateProvider.endSymbol(']]');
+	});
+
+	/**
+		* Function to check if user is signed in
+		*
+		**/
+
+		var isLoggedIn = false;
+
+	const checkIfLoggedIn = function () { //
+		var http = new XMLHttpRequest();
+		http.onreadystatechange = function () {
+			if (http.readyState == 4 &amp;&amp; http.status == 200) {
+				var data = JSON.parse(http.responseText);
+				console.log(data);
+				if (!data.success) return false;
+				isLoggedIn = true;
+			} else if (http.readyState == 4 &amp;&amp; http.status == 500) {
+				var data = http.responseText;
+				errorToast('Oops! Something went wrong on the server. Please reload the page and try again.', data)
+			}
+		}
+		http.open('POST', forumPath + 'api/login/checkCredentials', true);
+		http.send('token=' + token);
+	};
+
+	checkIfLoggedIn();
+
+	// TOASTR OPTIONS
+	toastr.options.showMethod       = 'fadeIn';
+	toastr.options.hideMethod       = 'slideUp';
+	toastr.options.closeMethod      = 'slideUp';
+	toastr.options.closeButton      = true;
+	toastr.options.showDuration     = 1000;  // 1s
+	toastr.options.hideDuration     = 1000;  // 1s
+	toastr.options.timeOut          = 7500;  // 7.5s
+	toastr.options.extendedTimeOut  = 10000; // 10s
+
+	app.factory('flarumjsApi', function ($http) {
+
+		return {
+
+			getParameterByName: function (par, url) {
+				if (!url) url = window.location.href;
+    		url = url.toLowerCase(); // This is just to avoid case sensitiveness
+    		par = par.replace(/[\[\]]/g, "\\$&amp;").toLowerCase();// This is just to avoid case sensitiveness for query parameter name
+    		var regex = new RegExp("[?&amp;]" + par + "(=([^&amp;#]*)|&amp;|#|$)"),
+    		results = regex.exec(url);
+    		if (!results) return null;
+    		if (!results[2]) return '';
+    		return decodeURIComponent(results[2].replace(/\+/g, " "));
+    	},
+
+    	getDiscussions: function (options, callback) {
+    		if (typeof options == 'function') {
+    			callback = options;
+    			options = {};
+    		}
+
+    		$http({
+    			method: 'GET',
+    			url: forumPath + 'api/discussions?q=' + options.q + '&amp;tag=' + options.tag
+    		}).then(function (response) {
+    			data = response.data;
+    			callback(null, data);
+    			return data;
+    		}, function (response) {
+    			var data = response.data;
+    			callback(data, data);
+    			return data;
+    		})
+    	}
+
+    }
+
+  });
+
+	app.controller('DiscussionListController', [ 'flarumjsApi', '$http', function (flarumjsApi, $http) {
+
+		var controller = this;
+
+		var tag = document.location.pathname.indexOf('/t/') >= 0 &amp;&amp; document.href.pathname.replace('/t/', '') || "";
+
+		/**
+			* Gets the discussion list from the api and displays them
+			* by using angularjs
+		**/ //
+
+		this.getDiscussions = function () {
+			controller.loaded = false;
+			flarumjsApi.getDiscussions({
+				tag: tag,
+				q: flarumjsApi.getParameterByName('q')
+			}, function (err, data) {
+
+				if (err) {
+					controller.noDiscussions = true;
+					errorToast('Error while trying to get discussions!', err.error);
+				} else if (data.posts) {
+					controller.noDiscussions = false;
+					controller.discussions = data.posts
+				} else if (data.noPosts) {
+					controller.noDiscussions = true;
+					controller.discussions = [];
+				}
+
+				controller.loaded = true;
+
+			});
+			// $http.get(forumPath + 'api/discussions').then(function (response) {
+			// 	data = response.data;
+			// 	if (data.error) {
+			// 		// doSomethin
+			// 		controller.loaded = true;
+			// 		controller.noDiscussions = true;
+			// 		errorToast('Error while trying to get discussions!', data.error);
+			// 		// toastr.error('Error while trying to get discussions! &amp;nbsp;&amp;nbsp;&lt;a id=\"openDebug\" data-error=\"' + data.error + '\">DEBUG&lt;/a>', null, {
+			// 		//  allowHtml: true,
+			// 		//  positionClass: 'toast-bottom-left',
+			// 		//  toastClass: 'toast'
+			// 		// })
+			// 	}
+			// 	if (data.noPosts) {
+			// 		controller.noDiscussions = true;
+			// 		controller.discussions = [];
+			// 	}
+			// 	if (data.posts) {
+			// 		controller.noDiscussions = false;
+			// 		controller.discussions = data.posts
+			// 	}
+			// 	controller.loaded = true;
+			// }, function (response) {
+
+			// 	var data = response.data;
+
+			// 	controller.loaded = true;
+			// 	controller.noDiscussions = true;
+			// 	errorToast('Error while trying to get discussions!', data.error);
+			// 		// toastr.error('Error while trying to get discussions! &amp;nbsp;&amp;nbsp;&lt;a id=\"openDebug\" data-error=\"' + data.error + '\">DEBUG&lt;/a>', null, {
+			// 		//  allowHtml: true,
+			// 		//  positionClass: 'toast-bottom-left',
+			// 		//  toastClass: 'toast'
+			// 		// })
+			// 	})
+		}
+
+		this.getDiscussions();
+	}]);
+
+	app.controller('IndexSideNavController', [ '$http', '$document', function ($http, $document) { //
+
+		var simplemde = new SimpleMDE({
+			element: document.getElementById("NewDiscussionContent"),
+			placeholder: 'Write a Post...'
+		});
+
+		simplemde.codemirror.on("change", function () {
+			controller.newDiscussionContent = marked(simplemde.value());
+			setTimeout(function () {
+				Prism.highlightAll(true);
+			}, 2500);
+		});
+
+		var controller = this;
+
+		controller.username = 'datitisev';
+
+		controller.closeNewDiscussionView = function () {
+			if (controller.newDiscussionTitle || simplemde.value()) {
+				if (confirm('You have not posted your discussion. \n Are you sure you want to discard it?')) {
+					controller.composerClass = '';
+					controller.composerDivClass = '';
+					controller.newDiscussionTitle = '';
+					simplemde.value('');
+					controller.showNewDiscussion = false;
+					controller.hideNewDiscussion = false;
+				}
+			} else {
+				controller.composerClass = '';
+				controller.composerDivClass = '';
+			}
+		}
+
+		controller.showNewDiscussionView = function () {
+
+			if (!isLoggedIn) {
+				errorToast('&lt;b>Couldn\'t Make A New Discussion&lt;/b>&lt;br/>You need to be logged in to be able to post a new discussion.')
+				return false;
+			}
+
+			controller.postNewDiscussionError = false;
+			controller.postNewDiscussionErrorMessage = '';
+			controller.newDiscussionTitleClass = '';
+			controller.newDiscussionContentClass = '';
+
+			controller.composerClass = 'show';
+			controller.composerDivClass = '';
+			controller.hideNewDiscussion = false;
+			controller.showNewDiscussion = true;
+		}
+
+		controller.postNewDiscussion = function () {
+
+			if (!isLoggedIn) {
+				errorToast('&lt;b>Couldn\'t Make A New Discussion&lt;/b>&lt;br/>You need to be logged in to be able to post a new discussion.')
+				return false;
+			}
+
+			controller.postNewDiscussionError = false;
+			controller.postNewDiscussionErrorMessage = '';
+			controller.newDiscussionTitleClass = '';
+			controller.newDiscussionContentClass = '';
+
+			if (!controller.newDiscussionTitle || controller.newDiscussionTitle.length &lt; 10) {
+				controller.postNewDiscussionError = true;
+				controller.newDiscussionTitleClass = 'error';
+
+				controller.postNewDiscussionErrorMessage += 'The title is missing or it is too short&lt;br/>Please be more specific with the title&lt;br/>&lt;small>Minimum 10 characters&lt;/small>&lt;hr/>';
+			}
+
+			if (!controller.newDiscussionContent || controller.newDiscussionContent.length &lt; 30) {
+				controller.postNewDiscussionError = true;
+				controller.newDiscussionContentClass = 'error';
+
+				controller.postNewDiscussionErrorMessage += 'The content is missing or it is too short&lt;br/>&lt;small>Minimum 30 characters&lt;/small>';
+			}
+
+			if (controller.postNewDiscussionError) {
+				errorToast('&lt;b>Could Not Post Discussion:&lt;/b>&lt;br/>' + controller.postNewDiscussionErrorMessage);
+				return false;
+			}
+
+			$http({
+				method: 'POST',
+				url: forumPath + 'api/discussions',
+				data: {
+					token: token,
+					title: controller.newDiscussionTitle,
+					content: controller.newDiscussionContent
+				}
+			}).then(function (response) {
+
+				console.log(response);
+
+			}, function (response) {
+
+				console.log(response);
+
+			});
+
+		}
+
+	}]);
+
+	app.controller('DiscussionViewController', [ '$http', function ($http) {
+
+		var controller = this;
+
+		var slug = document.location.pathname.replace(forumPath, '/').replace('/d/', '');
+		var index = parseInt(slug.split('-')[0])
+
+		$http({
+			method: 'GET',
+			url: forumPath + 'api/discussions/' + index,
+			data: {
+				index: index
+			}
+		}).then(function (response) {
+
+			var data = response.data;
+
+			if (data.postNotFound) {
+				controller.postNotFound = true;
+				return false;
+			}
+			if (data.error) {
+				toastr.error(data.error, null, {
+					allowHtml: true,
+					positionClass: 'toast-bottom-left',
+					toastClass: 'toast'
+				});
+			}
+
+			controller.post = data.post;
+		}, function (response) {
+			controller.loading = false;
+			errorToast('Error while trying to get discussions!', data.error);
+		})
+
+	}]);
+
+	app.controller('SignController', [ '$http', function ($http) {
+
+		var controller = this;
+
+		/**
+			* Function to sign up the user;
+			* Uses AngularJS
+			**/
+		this.signUp = function () { //
+
+			var errors = '';
+
+			if (!controller.signup_username) errors += 'Please enter a username&lt;br/>';
+			if (!controller.signup_email) errors += 'Please enter an email&lt;br/>';
+			if (!controller.signup_password) errors += 'Please enter a password&lt;br/>';
+			if (!controller.signup_passwordCheck) errors += 'Please reenter the password&lt;br/>';
+			if (controller.signup_password &amp;&amp; controller.signup_passwordCheck &amp;&amp; controller.signup_password != controller.signup_passwordCheck) errors += 'Passwords do not match&lt;br/>';
+
+			if (errors !== '') {
+				errors = '&lt;b>The following errors occured while trying to sign you up:&lt;/b>&lt;br/>' + errors;
+				errorToast(errors);
+				return false;
+			}
+
+			$http({
+				method: 'POST',
+				url: forumPath + 'api/signup',
+				data: {
+					username: controller.signup_username,
+					email: controller.signup_email,
+					password: controller.signup_password,
+					passwordCheck: controller.signup_passwordCheck
+				}
+			}).then(function (response) {
+
+				data = response.data;
+
+				if (data.errors.length > 0) {
+					errors += '&lt;b>The following errors occured while trying to sign you up:&lt;/b>&lt;br/>';
+
+					for (var i = 0; i &lt; data.errors.length; i++) {
+						errors += data.errors[i];
+						if (i == data.errors.length - 1) {
+							errorToast(errors);
+						}
+					}
+
+					return false;
+				}
+
+				document.location.assign(forumPath + 'auth/local/callback?username=' + controller.signup_username + '&amp;password=' + controller.signup_password);
+
+			}, function (response) {
+
+				var data = response.data;
+
+				if (response.status === 401) {
+					errors += '&lt;b>The following errors occured while trying to sign you up:&lt;/b>&lt;br/>';
+
+					for (var i = 0; i &lt; data.errors.length; i++) {
+						errors += data.errors[i];
+						if (i == data.errors.length - 1) {
+							errorToast(errors);
+						}
+					}
+				}
+
+			})
+		}
+
+		/**
+			* Function to login in the user;
+			* Uses AngularJS
+			* -
+			* First, Checks if valid credentials &amp; user exists.
+			* If user doesn't exist, redirects user to /api/login to login.
+			* If user exists, show error(s).
+			**/
+
+		this.logIn = function () { //
+
+			var errors = '';
+
+			if (!controller.signin_username) errors += 'Please enter a username&lt;br/>';
+			if (!controller.signin_password) errors += 'Please enter a password&lt;br/>';
+
+			if (errors.length > 0) {
+				errors = '&lt;b>The following errors occured while trying to sign you up:&lt;/b>&lt;br/>' + errors;
+				return errorToast(errors);
+			}
+
+
+			$http({
+				method: 'POST',
+				url: forumPath + 'api/login',
+				data: {
+					username: controller.signin_username,
+					password: controller.signin_password
+				}
+			}).then(function (response) {
+
+				data = response.data;
+
+				if (data.errors.length > 0) {
+
+					errors += '&lt;b>The following errors occured while trying to sign you up:&lt;/b>&lt;br/>';
+
+					for (var i = 0; i &lt; data.errors.length; i++) {
+						errors += data.errors[i];
+						if (i == data.errors.length - 1) {
+							errorToast(errors);
+						}
+					}
+
+				}
+
+				document.location.assign(forumPath + 'auth/local/callback?username=' + controller.signin_username + '&amp;password=' + controller.signin_password);
+
+			}, function (response) {
+
+				var data = response.data;
+
+				if (response.status == 401) {
+
+					errors += '&lt;b>The following errors occured while trying to sign you up:&lt;/b>&lt;br/>';
+
+					for (var i = 0; i &lt; data.errors.length; i++) {
+						errors += data.errors[i];
+						if (i == data.errors.length - 1) {
+							errorToast(errors);
+						}
+					}
+
+				}
+
+			})
+
+		}
+
+	}])
+
+
+	var errorToast = function (message, error) {
+		var html = `&lt;span class=\"Alert-body\" data-error=\"${error}\">${message}&lt;\/span>`;
+		if (error) {
+			html += "	&lt;ul class=\"Alert-controls\">" +
+			"						&lt;li>" +
+			"							&lt;button class=\"Button Button--link\" type=\"button\">&lt;span class=\"Button-label\">Debug&lt;\/span>" +
+			"							&lt;\/button>" +
+			"						&lt;\/li>" +
+			"					&lt;\/ul>";
+		}
+
+		toastr.clear()
+
+		toastr.error(html, null, {
+			allowHtml: true,
+			positionClass: 'toast-bottom-left',
+			toastClass: 'toast',
+			tapToDismiss: false,
+			closeButton: true
+		});
+	}
+}
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+<footer>
+
+
+	<span class="copyright">
+	© 2016 FlarumJS
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+		on Saturday, March 26th 2016, 6:13:32 pm
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+<script>
+	$( function () {
+		$( '#main' ).localScroll( {
+			offset : { top : 60 } //offset by the height of your header (give or take a few px, see what works for you)
+		} );
+		$( "dt.name" ).each( function () {
+			var $this = $( this ).find("h4");
+			var icon = $( "<i/>" ).addClass( "icon-plus-sign" ).addClass( "pull-right" ).addClass( "icon-white" );
+			var dt = $(this);
+			var children = dt.next( "dd" );
+
+			dt.prepend( icon ).css( {cursor : "pointer"} );
+			dt.addClass( "member-collapsed" ).addClass( "member" );
+
+
+			children.hide();
+
+			dt.children().on( "click", function () {
+				children = dt.next( "dd" );
+				children.slideToggle( "fast", function () {
+
+					if ( children.is( ":visible" ) ) {
+						icon.addClass( "icon-minus-sign" ).removeClass( "icon-plus-sign" ).removeClass( "icon-white" );
+						dt.addClass( "member-open" ).animate( "member-collapsed" );
+					} else {
+						icon.addClass( "icon-plus-sign" ).removeClass( "icon-minus-sign" ).addClass( "icon-white" );
+						dt.addClass( "member-collapsed" ).removeClass( "member-open" );
+					}
+				} );
+			} );
+
+		} );
+	} );
+</script>
+
+
+<!--Google Analytics-->
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
+
+</body>
+</html>

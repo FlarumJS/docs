@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>FlarumJS/Node-Flarum Inline Documentation Index</title>
+	<title>FlarumJS/Node-Flarum Inline Documentation Source: config/passport.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -58,71 +58,217 @@
 <div class="row">
 
 	
-	<div class="col-md-8">
+	<div class="col-md-12">
 	
 		<div id="main">
 			
 
-	
-	
+		<h1 class="page-title">Source: config/passport.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+var GithubStrategy = require('passport-github').Strategy;
+
+var debug = require('debug')('flarum:login');
+var crypto = require('crypto');
+
+var models = require('./../models');
+var User = models.user;
+var ForumSettings = models.forum.settings;
+var ModelFind = models.find;
+var GetLatestId = models.latestId;
+
+var passportjs = require('./../config/passport');
+var functions = require('./../config/functions');
+
+var throwError = functions.throwError;
 
 
+/**
+	* Function to set up passport strategies
+	*
+	* @param {String}   forumPath -  the forum's path
+	* @param {Passport} passport  -  the passport.js object
+	**/
+	module.exports = function (forumPath, passport) {
+
+		passport.serializeUser(function(user, done) {
+			done(null, user.username);
+		});
+
+		passport.deserializeUser(function(username, done) {
+			ModelFind(User, {
+				'username' : username
+			}, function (err, user) {
+				done(err, user[0]);
+			})
+		});
+
+		passport.use('local-signup', new LocalStrategy({
+			usernameField: 'username',
+			passwordField: 'password',
+			passReqToCallback: true
+		}, function (req, username, password, done) {
+
+			process.nextTick(function () {
+
+				ModelFind(User, {
+					'username': username
+				}, function (err, user) {
+
+					if (err) {
+						throwError('[PASSPORT] SIGNUP: Error in ModelFind', err);
+						done(err);
+					}
+
+					if (user &amp;&amp; user.length != 0) {
+						return done('Username already exists', false);
+					} else {
+
+						ModelFind(User, {
+							'email': req.body.email
+						}, function (err, user) {
+
+							if (err) {
+								throwError('[PASSPORT] SIGNUP: Error in 2nd ModelFind', err);
+								done(err);
+							}
+
+							if (user &amp;&amp; user.length != 0) {
+								return done('Email already exists', false);
+							} else {
+
+								var newUser = new User();
+
+								newUser.username = username;
+								newUser.email = req.body.email;
+								newUser.createdIn = new Date()
+								newUser.password = newUser.generateHash(password);
+								newUser.token = crypto.randomBytes(40).toString('hex');
+
+								GetLatestId(User, function (err, id) {
+									if (err) done(err, null);
+
+									newUser._id = id;
+
+									newUser.save(function (err) {
+										if (err) {
+											debug(err);
+											throwError('[PASSPORT] SIGNUP: Error @ saving new user', err);
+											done(err);
+										}
+										return done(null, newUser);
+									})
+								})
+							}
+
+						})
+
+					}
+				})
+
+			})
+		}));
+
+		passport.use('local-login', new LocalStrategy({
+			passReqToCallback: true
+		}, function (req, username, password, done) {
+
+			User.findOne({
+				'username': username
+			}, function (err, user) {
+
+				if (err) return done(err);
+
+				if (!user || user.length == 0) return done('No user found', false);
+
+				if (!user.password) return done('Sorry, this user signed up with social media, therefore has no password', false);
+
+				if (!user.validPassword(password)) return done('Oops! Wrong password.', false);
+
+				User.findOneAndUpdate({
+					'username': username
+				}, {
+					'lastLoggedIn': new Date()
+				}, {
+					new: true
+				}, (err, user) => done(err, user))
+
+			})
+		}));
 
 
+		ModelFind(ForumSettings, {
+			name: 'auth.github.credentials'
+		}, function (err, credentials) {
+			if (err) return throwError('[PASSPORT] Get Credentials for GitHub', err);
+			if (!credentials || !credentials.length) {
+				debug('[GitHub] No credentials found!');
+				return false;
+			}
+
+			debug('[GitHub] Credentials Found!');
 
 
+			passport.use('github', new GithubStrategy({
+				clientID: credentials[0].content.clientID,
+				clientSecret: credentials[0].content.clientSecret,
+				callbackUrl: forumPath + 'auth/github/callback'
+			}, function (accessToken, refreshToken, profile, done) {
 
+				ModelFind(User, {
+					'github.id': profile.id
+				}, function (err, user) {
+					if (err) return done(err, user);
 
+					if (user &amp;&amp; user.length > 0) {
+						User.findOneAndUpdate({
+							'github.id' : profile.id
+						}, {
+							'github.id' : profile.id,
+							username: profile.username,
+							avatar: profile.photos[0] &amp;&amp; profile.photos[0].value || null,
+							lastLoggedIn: new Date()
+						}, {
+							upsert: true,
+							new: true
+						}, (err, user) => done(err, user));
+					} else {
 
+						var newGithubUser = new User();
+						newGithubUser.github = {};
+						newGithubUser.github.id = profile.id;
+						newGithubUser.username = profile.username;
+						newGithubUser.avatar = profile.photos[0] &amp;&amp; profile.photos[0].value || null;
+						newGithubUser.lastLoggedIn = new Date();
+						newGithubUser.createdIn = new Date();
+						newGithubUser.token = crypto.randomBytes(40).toString('hex');
 
+						GetLatestId(User, function (err, id) {
+							if (err) return done(err, null);
+							if (!id) return done('Something weird happened while trying to get a user ID for you', null);
 
-	
-	
+							newGithubUser._id = id;
 
+							newGithubUser.save(function (err, user) {
+								throwError('[GitHub Sign In] ' + err);
+								done(err, newGithubUser);
+							});
+						})
 
+					}
 
+				})
+			}))
+		})
 
-
-    <section class="readme-section">
-        <article><h1>node-flarum</h1><p><a href="https://travis-ci.org/FlarumJS/node-flarum"><img src="https://travis-ci.org/FlarumJS/node-flarum.svg?branch=master" alt="Build Status"></a> <a href="https://badge.fury.io/gh/FlarumJS%2Fnode-flarum"><img src="https://badge.fury.io/gh/FlarumJS%2Fnode-flarum.svg" alt="GitHub version"></a> <a href="https://badge.fury.io/js/node-flarum"><img src="https://badge.fury.io/js/node-flarum.svg" alt="NPM version"></a></p>
-<p>A forum made out of <a href="http://flarum.org">Flarum</a>'s design forum with NodeJS</p>
-<hr>
-<h2>Installation</h2><h4>NPM</h4><pre class="prettyprint source lang-sh"><code>npm install node-flarum --save</code></pre><h4>Latest Stable Release</h4><pre class="prettyprint source lang-sh"><code>npm install git+https://github.com/FlarumJS/node-flarum.git --save</code></pre><h4>Latest Release</h4><pre class="prettyprint source lang-sh"><code>npm install git+https://github.com/FlarumJS/node-flarum.git#develop</code></pre><h2>Usage</h2><h3>HTTP</h3><p>Using the http package required the following modules to be installed: <em>connect</em> &amp; <em>connect-hopeful-body-parser</em></p>
-<pre class="prettyprint source lang-node"><code>var http = require('http');
-var connect = require('connect');
-var bodyParser = require('connect-hopeful-body-parser');
-
-var flarum = require('./index');
-
-var app = connect();
-
-app.use(bodyParser());
-app.use(flarum); // You can only have flarum in root path, otherwise won't work
-
-http.createServer(app).listen(8080);</code></pre><h3>Express</h3><pre class="prettyprint source lang-node"><code>var flarum = require('node-flarum');
-
-var express = require('express');
-var app = express();
-
-// Other stuff
-
-app.use('/forum', flarum) // This will execute flarum on the &quot;/forum&quot; path
-app.use(flarum)           // This will execute flarum on the root path</code></pre><hr>
-<h2>Inline Docs</h2><h3>Online</h3><p>Visit the <a href="http://flarumjs.github.io/docs/">FlarumJS Inline Docs</a></p>
-<h3>Offline / Locally</h3><p>Install <em>jsdoc</em> by typing <code>npm install jsdoc</code> inside the node-flarum package folder. After installing <em>jsdoc</em> execute
-<code>jsdoc -t ./node_modules/ink-docstrap/template -c docs.config.json -R README.md -r . -d ./docs</code>
-in the project root and then open <code>docs/index.html</code> in your web browser</p>
-<h2>Contributing</h2><p>Whenever this forum is complete [•••], there will be a website here for the official <em>NodeJS</em> Flarum forum</p>
-<hr>
-<h2>Release History</h2><ul>
-<li>v0.0.1 - NPM Package Information</li>
-<li>v0.0.2 - Added Configuration Tweaks, fixed links and mongodb problems (<a href="https://github.com/FlarumJS/node-flarum/releases/tag/v0.0.2">Full Release Information</a>)</li>
-<li>v0.0.3 - Added Sign Up &amp; Log In Options; Added inline documentation for the package (<a href="https://github.com/FlarumJS/node-flarum/releases/tag/v0.0.3">Full Release Information</a>)</li>
-<li>v0.0.4 - Added Github Login; Added Ability to Create Discussions; Updated Schemas for the better; Etc... (<a href="https://github.com/FlarumJS/node-flarum/releases/tag/v0.0.4">Full Release Information</a>)</li>
-</ul></article>
-    </section>
-
-
+	}
+</pre>
+    </article>
+</section>
 
 
 
@@ -133,10 +279,6 @@ in the project root and then open <code>docs/index.html</code> in your web brows
 
 	<div class="clearfix"></div>
 
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
 	
 
 </div>

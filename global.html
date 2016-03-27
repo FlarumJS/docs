@@ -33,7 +33,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu inline">
-					<li><a href="global.html#connectMongo">connectMongo</a></li><li><a href="global.html#getFalseDiscussionList">getFalseDiscussionList</a></li><li><a href="global.html#throwError">throwError</a></li><li><a href="global.html#ModelFind">ModelFind</a></li><li><a href="global.html#executeAngular">executeAngular</a></li><li><a href="global.html#getDiscussions">getDiscussions</a></li><li><a href="global.html#signUp">signUp</a></li><li><a href="global.html#logIn">logIn</a></li>
+					<li><a href="global.html#connectMongo">connectMongo</a></li><li><a href="global.html#throwError">throwError</a></li><li><a href="global.html#createFlarumFolder">createFlarumFolder</a></li><li><a href="global.html#createConfigFile">createConfigFile</a></li><li><a href="global.html#sluglify">sluglify</a></li><li><a href="global.html#getFalseDiscussionList">getFalseDiscussionList</a></li><li><a href="global.html#ModelFind">ModelFind</a></li><li><a href="global.html#executeAngular">executeAngular</a></li><li><a href="global.html#getDiscussions">getDiscussions</a></li><li><a href="global.html#signUp">signUp</a></li><li><a href="global.html#logIn">logIn</a></li>
 				</ul>
 			</li>
 			
@@ -272,107 +272,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="lib_config_functions.js.html">lib/config/functions.js</a>,
-				 <a href="lib_config_functions.js.html#sunlight-1-line-13">line 13</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    object
-</div>
-
-
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getFalseDiscussionList"><span class="type-signature"></span>getFalseDiscussionList()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get a false discussion list; for development only
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="lib_config_functions.js.html">lib/config/functions.js</a>,
-				 <a href="lib_config_functions.js.html#sunlight-1-line-103">line 103</a>
+				<a href="config_functions.js.html">config/functions.js</a>,
+				 <a href="config_functions.js.html#sunlight-1-line-17">line 17</a>
 			</li>
 		</ul>
 	</dd>
@@ -544,8 +445,8 @@
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="lib_config_functions.js.html">lib/config/functions.js</a>,
-				 <a href="lib_config_functions.js.html#sunlight-1-line-152">line 152</a>
+				<a href="config_functions.js.html">config/functions.js</a>,
+				 <a href="config_functions.js.html#sunlight-1-line-175">line 175</a>
 			</li>
 		</ul>
 	</dd>
@@ -575,6 +476,625 @@
             
 <div class="param-desc">
     false
+</div>
+
+
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="createFlarumFolder"><span class="type-signature"></span>createFlarumFolder(flarumFolderDirectory, callback)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Create the flarum/ directory
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>flarumFolderDirectory</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the flarum/ folder directory</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">callback for function</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="config_functions.js.html">config/functions.js</a>,
+				 <a href="config_functions.js.html#sunlight-1-line-193">line 193</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">
+createFlarumFolder(&#x27;/Users/Anonymous/FlarumJS/flarum&#x27;, function (err) {
+  if (err) throw err;
+  // Do Something Else
+})</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="createConfigFile"><span class="type-signature"></span>createConfigFile(flarumFolderDirectory, content, callback)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Create the config.json file in the flarum/ directory
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>flarumFolderDirectory</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the flarum/ folder directory</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>content</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the content to write into config.json</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">callback</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="config_functions.js.html">config/functions.js</a>,
+				 <a href="config_functions.js.html#sunlight-1-line-215">line 215</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="sluglify"><span class="type-signature"></span>sluglify(text)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Convert simple string to a valid url, or slug
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>text</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">text to convert to slug</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="config_functions.js.html">config/functions.js</a>,
+				 <a href="config_functions.js.html#sunlight-1-line-241">line 241</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    text converted to valid url, or slug
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getFalseDiscussionList"><span class="type-signature"></span>getFalseDiscussionList()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Get a false discussion list; for development only
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="config_functions.js.html">config/functions.js</a>,
+				 <a href="config_functions.js.html#sunlight-1-line-127">line 127</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    object
 </div>
 
 
@@ -742,8 +1262,8 @@ Supposedly "learns" from what it does...
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="lib_models_index.js.html">lib/models/index.js</a>,
-				 <a href="lib_models_index.js.html#sunlight-1-line-108">line 108</a>
+				<a href="models_index.js.html">models/index.js</a>,
+				 <a href="models_index.js.html#sunlight-1-line-114">line 114</a>
 			</li>
 		</ul>
 	</dd>
@@ -786,7 +1306,7 @@ ModelFind(User, { username: &quot;username&quot; }, function (err, user) {
             
 <hr>
 <dt>
-    <h4 class="name" id="executeAngular"><span class="type-signature"></span>executeAngular(forumPath, user)</h4>
+    <h4 class="name" id="executeAngular"><span class="type-signature"></span>executeAngular(forumPath, userToken)</h4>
     
     
 </dt>
@@ -854,13 +1374,13 @@ Used to get the forumPath & user values
 
         <tr>
             
-                <td class="name"><code>user</code></td>
+                <td class="name"><code>userToken</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">String</span>
 
 
 
@@ -871,7 +1391,7 @@ Used to get the forumPath & user values
 
             
 
-            <td class="description last">the user object from req.user in lib/routes/index.js</td>
+            <td class="description last">the user's token from req.user in lib/routes/index.js</td>
         </tr>
 
     
@@ -915,8 +1435,8 @@ Used to get the forumPath & user values
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="lib_public_assets_angular_app.js.html">lib/public/assets/angular/app.js</a>,
-				 <a href="lib_public_assets_angular_app.js.html#sunlight-1-line-9">line 9</a>
+				<a href="public_assets_angular_app.js.html">public/assets/angular/app.js</a>,
+				 <a href="public_assets_angular_app.js.html#sunlight-1-line-9">line 9</a>
 			</li>
 		</ul>
 	</dd>
@@ -1004,8 +1524,8 @@ by using angularjs
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="lib_public_assets_angular_app.js.html">lib/public/assets/angular/app.js</a>,
-				 <a href="lib_public_assets_angular_app.js.html#sunlight-1-line-47">line 47</a>
+				<a href="public_assets_angular_app.js.html">public/assets/angular/app.js</a>,
+				 <a href="public_assets_angular_app.js.html#sunlight-1-line-112">line 112</a>
 			</li>
 		</ul>
 	</dd>
@@ -1093,8 +1613,8 @@ Uses AngularJS
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="lib_public_assets_angular_app.js.html">lib/public/assets/angular/app.js</a>,
-				 <a href="lib_public_assets_angular_app.js.html#sunlight-1-line-246">line 246</a>
+				<a href="public_assets_angular_app.js.html">public/assets/angular/app.js</a>,
+				 <a href="public_assets_angular_app.js.html#sunlight-1-line-323">line 323</a>
 			</li>
 		</ul>
 	</dd>
@@ -1186,8 +1706,8 @@ If user exists, show error(s).
 	<dd class="tag-source">
 		<ul class="dummy">
 			<li>
-				<a href="lib_public_assets_angular_app.js.html">lib/public/assets/angular/app.js</a>,
-				 <a href="lib_public_assets_angular_app.js.html#sunlight-1-line-321">line 321</a>
+				<a href="public_assets_angular_app.js.html">public/assets/angular/app.js</a>,
+				 <a href="public_assets_angular_app.js.html#sunlight-1-line-394">line 394</a>
 			</li>
 		</ul>
 	</dd>
@@ -1268,7 +1788,7 @@ If user exists, show error(s).
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
 	
-		on Sunday, February 28th 2016, 12:28:28 pm
+		on Saturday, March 26th 2016, 6:13:32 pm
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

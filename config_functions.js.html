@@ -33,7 +33,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu inline">
-					<li><a href="global.html#connectMongo">connectMongo</a></li><li><a href="global.html#getFalseDiscussionList">getFalseDiscussionList</a></li><li><a href="global.html#ModelFind">ModelFind</a></li><li><a href="global.html#throwError">throwError</a></li>
+					<li><a href="global.html#connectMongo">connectMongo</a></li><li><a href="global.html#throwError">throwError</a></li><li><a href="global.html#createFlarumFolder">createFlarumFolder</a></li><li><a href="global.html#createConfigFile">createConfigFile</a></li><li><a href="global.html#sluglify">sluglify</a></li><li><a href="global.html#getFalseDiscussionList">getFalseDiscussionList</a></li><li><a href="global.html#ModelFind">ModelFind</a></li><li><a href="global.html#executeAngular">executeAngular</a></li><li><a href="global.html#getDiscussions">getDiscussions</a></li><li><a href="global.html#signUp">signUp</a></li><li><a href="global.html#logIn">logIn</a></li>
 				</ul>
 			</li>
 			
@@ -69,167 +69,261 @@
     <article>
         <pre
             class="sunlight-highlight-javascript linenums">var mongoose = require('mongoose');
+var path = require('path');
+var fs = require('fs');
 var debugError = require('debug')('flarum:error');
 var connected;
 
-/**
-	* Connect to mongodb via mongoose
-	*
-	* @param {Object}   mongo      - object containing host &amp; database; optional: username &amp; password
-	* @param {Function} callback   - callback function
-	*
-	* @return object
-**/
-var connectMongo = function (mongo, callback) {
-	connected = false;
-
-	if (!mongo || typeof mongo !== 'object') return { error: 'INVALID ARGUMENTS: No "mongo" typeof object argument found', mongo: null }
-
-	if (mongo.host &amp;&amp; mongo.database &amp;&amp; !mongo.username &amp;&amp; !mongo.password) {
-		var mongoUrl = 'mongodb://' + mongo.host + '/' + mongo.database;
-		mongoose.connect(mongoUrl);
-
-		mongoose.connection.on('error', function (err) {
-			connected = true;
-			if (!callback) {
-				return { error: 'Could not connect to MongoDB; ' + err, mongo: null }
-			} else {
-				callback('Could not connect to MongoDB; ' + err, null)
-			}
-		});
-		mongoose.connection.on('open', function (ref) {
-			connected = true;
-
-			if (callback) callback(null, mongoose.connection);
-
-			return { error: null, mongo: true }
-
-		});
-
-
-		setTimeout(function () {
-			if (!connected) {
-				if (!callback) {
-					return { error: 'Could not connect to MongoDB; ERROR: Timeout', mongo: null }
-				} else {
-					callback('Could not connect to MongoDB; ERROR: Timeout', null);
-				}
-			}
-
-		}, 7500)
-
-	} else if (mongo.host &amp;&amp; mongo.database &amp;&amp; mongo.username &amp;&amp; mongo.password) {
-
-		var mongoUrl = 'mongodb://' + mongo.username + ':';
-		mongoUrl += mongo.password + '@';
-		mongoUrl += mongo.host + '/' + mongo.database;
-		mongoose.connect(mongoUrl);
-
-		mongoose.connection.on('error', function (err) {
-			connected = true;
-			if (!callback) {
-				return { error: 'Could not connect to MongoDB; ' + err, mongo: null }
-			} else {
-				callback('Could not connect to MongoDB; ' + err, null)
-			}
-		});
-		mongoose.connection.on('open', function (ref) {
-			connected = true;
-
-			if (!callback) {
-				return { error: null, mongo: mongoose.connection }
-			} else {
-				callback(null, mongoose.connection)
-			}
-
-		});
-
-		setTimeout(function () {
-			if (!connected) {
-				if (!callback) {
-					return { error: 'Could not connect to MongoDB; ERROR: Timeout', mongo: null }
-				} else {
-					callback('Could not connect to MongoDB; ERROR: Timeout', null);
-				}
-			}
-
-		}, 7500)
-
-	} else {
-		if (!callback) {
-			return { error: 'Invalid credentials provided; Either (host+db) or (host+db+username+password) are allowed', mongo: null }
-		} {
-			callback(null, null);
-		}
-	}
-}
-
+var exports = module.exports = {};
 
 /**
-	* Get a false discussion list; for development only
-	*
-	* @return object
+* Connect to mongodb via mongoose
+*
+* @param {Object}   mongo      - object containing host &amp; database; optional: username &amp; password
+* @param {Function} callback   - callback function
+*
+* @return object
 **/
-var getFalseDiscussionList = function () {
-	var falseDiscussionList = {
-		posts: [
-			{
-				title: 'lol',
-				slug: '1-test-discussion',
-				start_username: 'datitisev',
-				last_username: 'hola',
-				replyCount: 9,
-				tags: [
-					{
-						color: 'red',
-						label: 'Hi'
-					}, {
-						color: 'yellow',
-						label: 'Bye'
-					}
-				]
-			},
-			{
-				title: 'hahaha',
-				slug: '2-test-discussion',
-				start_username: 'hola',
-				last_username: 'datitisev',
-				replyCount: 24,
-				tags: [
-					{
-						color: 'blue',
-						label: 'Blue'
-					}, {
-						color: 'lightgray',
-						label: 'General'
-					}
-				]
-			}
-		]
-	}
-	return falseDiscussionList;
-}
+exports.connectMongo = function (mongo, callback) {
+  var connected = false;
+  var mongoUrl = '';
 
+  if (!mongo || typeof mongo !== 'object') return {
+    error: 'INVALID ARGUMENTS: No "mongo" typeof object argument found',
+    mongo: null,
+  };
+
+  if (mongo.host &amp;&amp; mongo.database &amp;&amp; !mongo.username &amp;&amp; !mongo.password) {
+    mongoUrl = 'mongodb://' + mongo.host + '/' + mongo.database;
+    mongoose.connect(mongoUrl);
+
+    mongoose.connection.on('error', function (err) {
+      connected = true;
+      if (!callback) {
+        return { error: 'Could not connect to MongoDB; ' + err, mongo: null };
+      } else {
+        callback('Could not connect to MongoDB; ' + err, null);
+      }
+    });
+
+    mongoose.connection.on('open', function () {
+      connected = true;
+
+      if (callback) callback(null, mongoose.connection);
+
+      return { error: null, mongo: true };
+
+    });
+
+    setTimeout(function () {
+      if (!connected) {
+        if (!callback) {
+          return {
+            error: 'Could not connect to MongoDB; ERROR: Timeout',
+            mongo: null,
+          };
+        } else {
+          callback('Could not connect to MongoDB; ERROR: Timeout', null);
+        }
+      }
+
+    }, 7500);
+
+  } else if (mongo.host &amp;&amp; mongo.database &amp;&amp; mongo.username &amp;&amp; mongo.password) {
+
+    mongoUrl = 'mongodb://' + mongo.username + ':';
+    mongoUrl += mongo.password + '@';
+    mongoUrl += mongo.host + '/' + mongo.database;
+    mongoose.connect(mongoUrl);
+
+    mongoose.connection.on('error', function (err) {
+      connected = true;
+      if (!callback) {
+        return {
+          error: 'Could not connect to MongoDB; ' + err,
+          mongo: null,
+        };
+      } else {
+        callback('Could not connect to MongoDB; ' + err, null);
+      }
+    });
+
+    mongoose.connection.on('open', function (ref) {
+      connected = true;
+
+      if (!callback) {
+        return {
+          error: null,
+          mongo: mongoose.connection,
+        };
+      } else {
+        callback(null, mongoose.connection);
+      }
+
+    });
+
+    setTimeout(function () {
+      if (!connected) {
+        if (!callback) {
+          return {
+            error: 'Could not connect to MongoDB; ERROR: Timeout',
+            mongo: null,
+          };
+        } else {
+          callback('Could not connect to MongoDB; ERROR: Timeout', null);
+        }
+      }
+
+    }, 7500);
+
+  } else {
+    if (!callback) {
+      return {
+        error: 'Invalid credentials provided; Either (host+db)' +
+        ' or (host+db+username+password) are allowed',
+        mongo: null,
+      };
+    } else {
+      callback(null, null);
+    }
+  }
+};
 
 /**
-	* Throw an error without stopping nodejs program
-	*
-	* @param {String}  message  - message to debug
-	* @param {Error}   error    - unexpected error, if any, that returned from the function
-	*
-	* @return false
+* Get a false discussion list; for development only
+*
+* @return object
 **/
-var throwError = function (message, error) {
-	debugError(message);
-	if (error) debugError(error);
-	return false;
+exports.getFalseDiscussionList = function () {
+  var falseDiscussionList = {
+    posts: [
+      {
+        title: 'lol',
+        slug: '1-test-discussion',
+        start_username_id: '1',
+        last_username: 'hola',
+        replyCount: 0,
+        tags: [
+          {
+            color: 'red',
+            label: 'Hi',
+          }, {
+            color: 'yellow',
+            label: 'Bye',
+          },
+        ],
+      },
+      {
+        title: 'hahaha',
+        slug: '2-test-discussion',
+        start_username: 'hola',
+        last_username: 'datitisev',
+        replyCount: 24,
+        tags: [
+          {
+            color: 'blue',
+            label: 'Blue',
+          }, {
+            color: 'lightgray',
+            label: 'General',
+          },
+        ],
+      },
+    ],
+  };
+  return falseDiscussionList;
+};
+
+/**
+* Throw an error without stopping nodejs program
+*
+* @param {String}  message  - message to debug
+* @param {Error}   error    - unexpected error, if any, that returned from the function
+*
+* @return false
+**/
+exports.throwError = function (message, error) {
+  debugError(message);
+  if (error) debugError(error);
+  return false;
+};
+
+/**
+* Create the flarum/ directory
+*
+* @param {String}   flarumFolderDirectory    -  the flarum/ folder directory
+* @param {Function} callback                 -  callback for function
+*
+* @example {@lang javascript}
+* createFlarumFolder('/Users/Anonymous/FlarumJS/flarum', function (err) {
+*   if (err) throw err;
+*   // Do Something Else
+* })
+**/
+exports.createFlarumFolder = function (flarumFolderDirectory, callback) {
+  fs.mkdir(flarumFolderDirectory, function (err) {
+    if (err) {
+      console.log('============================================================');
+      console.log('Error while trying to create flarum/ directory');
+      console.log(err);
+      console.log('============================================================');
+      return callback(err);
+    }
+
+    callback();
+  });
+};
+
+/**
+ * Create the config.json file in the flarum/ directory
+ *
+ * @param  {String}   flarumFolderDirectory - the flarum/ folder directory
+ * @param  {String}   content               - the content to write into config.json
+ * @param  {Function} callback              - callback
+ */
+
+exports.createConfigFile = function (flarumFolderDirectory, content, callback) {
+  if (typeof content === 'function' || !content || !callback) {
+    callback = content || function () {};
+
+    content = '{}';
+  }
+
+  fs.writeFile(path.join(flarumFolderDirectory, 'config.json'), content, function (err) {
+    if (err) {
+      console.log('============================================================');
+      console.log('Error while trying to create flarum/config.json file');
+      console.log(err);
+      console.log('============================================================');
+    }
+
+    callback(err);
+  });
+};
+
+/**
+ * Convert simple string to a valid url, or slug
+ *
+ * @param  {String} text - text to convert to slug
+ *
+ * @return {String}      text converted to valid url, or slug
+ */
+exports.sluglify = function (text) {
+  return text.toString().toLowerCase()
+    .replace(/\s+/g, '-')           // Replace spaces with -
+    .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+    .replace(/^-+/, '')             // Trim - from start of text
+    .replace(/-+$/, '');            // Trim - from end of text
 }
 
-module.exports = {
-	connectMongo: connectMongo,
-	getFalseDiscussionList: getFalseDiscussionList,
-	throwError: throwError
-}
+// module.exports = {
+//   connectMongo: connectMongo,
+//   getFalseDiscussionList: getFalseDiscussionList,
+//   throwError: throwError,
+//   createFlarumFolder: createFlarumFolder,
+//   createConfigFile: createConfigFile,
+// };
 </pre>
     </article>
 </section>
@@ -273,11 +367,7 @@ module.exports = {
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
 	
-<<<<<<< HEAD
-		on Sunday, February 28th 2016, 11:58:38 am
-=======
-		on Saturday, February 27th 2016, 8:43:26 pm
->>>>>>> db1a9f5f91c825478534d7b39a2f7673332aedf3
+		on Saturday, March 26th 2016, 6:13:32 pm
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
